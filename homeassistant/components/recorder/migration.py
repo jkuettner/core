@@ -104,7 +104,7 @@ def _create_index(connection, table_name, index_name):
     )
     try:
         index.create(connection)
-    except (InternalError, ProgrammingError, OperationalError) as err:
+    except (InternalError, OperationalError, ProgrammingError) as err:
         raise_if_exception_missing_str(err, ["already exists", "duplicate"])
         _LOGGER.warning(
             "Index %s already exists on %s, continuing", index_name, table_name
@@ -205,7 +205,7 @@ def _add_columns(connection, table_name, columns_def):
             )
         )
         return
-    except (InternalError, OperationalError):
+    except (InternalError, OperationalError, ProgrammingError):
         # Some engines support adding all columns at once,
         # this error is when they don't
         _LOGGER.info("Unable to use quick column add. Adding 1 by 1")
@@ -219,7 +219,7 @@ def _add_columns(connection, table_name, columns_def):
                     )
                 )
             )
-        except (InternalError, OperationalError) as err:
+        except (InternalError, OperationalError, ProgrammingError) as err:
             raise_if_exception_missing_str(err, ["already exists", "duplicate"])
             _LOGGER.warning(
                 "Column %s already exists on %s, continuing",
